@@ -1,8 +1,12 @@
+import sys
+
 import numpy as np  # this library allows us to use a matrix
+import pygame
 
 ROWS = 6
 COLUMNS = 7
-
+BLUE = (0,0,255)
+BLACK = (0,0,0)
 
 def makeboard():
     # Top most row is the 5th row
@@ -64,37 +68,62 @@ def diagonalcheck(board, mark):
 def printboard(board):
     print(np.flip(board, 0))  # flips the board so then the most recent will be in the lowest place
 
+def drawboard(board):
+    for col in range(COLUMNS):
+        for row in range(ROWS):
+            pygame.draw.rect(screen,BLUE, (col * SCALE, row * SCALE + SCALE, SCALE, SCALE))
+            pygame.draw.circle(screen, BLACK, (int(col*SCALE + SCALE / 2), int(row*SCALE + SCALE + SCALE / 2)), RADIUS)
 
 board = makeboard()
 print(board)
 endgame = False
-
 turn = 0
+
+# initializing pygame
+pygame.init()
+
+SCALE = 100# unit is in pixels
+width = COLUMNS * SCALE
+height = ROWS + 1 * SCALE
+RADIUS = int(SCALE / 2 - 5)
+
+windowsize = (width, height)
+screen = pygame.display.set_mode(windowsize)
+drawboard(board)
+
+pygame.display.update()
+
 while not endgame:
-    # P1 input
-    if turn == 0:
-        col = int(input("Player 1 Pick a column (0 - 6): "))
-        if isavailable(board, col):
-            row = getnextavailablerow(board, col)
-            makemove(board, row, col, 1)
-        if checkwinner(board, 1):
-            print("Player 1 won!")
-            endgame = True
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            continue
+            # P1 input
+            # if turn == 0:
+            #     col = int(input("Player 1 Pick a column (0 - 6): "))
+            #     if isavailable(board, col):
+            #         row = getnextavailablerow(board, col)
+            #         makemove(board, row, col, 1)
+            #     if checkwinner(board, 1):
+            #         print("Player 1 won!")
+            #         endgame = True
+            #
+            # # P2 input
+            # else:
+            #     col = int(input("Player 2 Pick a column (0 - 6): "))
+            #     if isavailable(board, col):
+            #         row = getnextavailablerow(board, col)
+            #         makemove(board, row, col, 2)
+            #     if checkwinner(board, 2):
+            #         print("Player 2 won!")
+            #         endgame = True
 
-    # P2 input
-    else:
-        col = int(input("Player 2 Pick a column (0 - 6): "))
-        if isavailable(board, col):
-            row = getnextavailablerow(board, col)
-            makemove(board, row, col, 2)
-        if checkwinner(board, 2):
-            print("Player 2 won!")
-            endgame = True
+            # printboard(board)
+            #
+            # # Switching the player turns
+            # if turn == 0:
+            #     turn = 1
+            # else:
+            #     turn = 0
 
-    printboard(board)
-
-    # Switching the player turns
-    if turn == 0:
-        turn = 1
-    else:
-        turn = 0
