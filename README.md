@@ -1,2 +1,2 @@
-# Connect4 Game in Python
+# Connect 4 Game in Python
 
