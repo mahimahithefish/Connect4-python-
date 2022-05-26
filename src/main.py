@@ -14,13 +14,27 @@ def makemove(board, row, col, mark):
 
 
 def isavailable(board, col): # Checks if the given column is available to make a move
-    return board[5][col] == 0  # If it is true then we are good to make a move in this column!
+    return board[ROWS - 1][col] == 0  # If it is true then we are good to make a move in this column!
 
 
 def getnextavailablerow(board, col):
     for row in range(ROWS):
         if board[row][col] == 0:
             return row
+
+def checkwinner(board, mark):
+    # check horizontally
+
+    # check vertically
+    # Check diagonally
+
+def horizontalcheck(board, mark):
+    pass
+def verticalcheck(board, mark):
+    pass
+def diagonalcheck(board, mark):
+    pass
+
 def printboard(board):
     print(np.flip(board, 0))  # flips the board so then the most recent will be in the lowest place
 
