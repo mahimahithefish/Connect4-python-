@@ -1,3 +1,4 @@
+import math
 import sys
 
 import numpy as np  # this library allows us to use a matrix
@@ -5,9 +6,10 @@ import pygame
 
 ROWS = 6
 COLUMNS = 7
-BLUE = (0,0,255)
-BLACK = (0,0,0)
-
+BLUE = (0, 0, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+YELLOW = (255, 255, 0)
 def makeboard():
     # Top most row is the 5th row
     board = np.zeros((ROWS, COLUMNS))  # make a matrix of 6 rows and 7 columns
@@ -68,11 +70,24 @@ def diagonalcheck(board, mark):
 def printboard(board):
     print(np.flip(board, 0))  # flips the board so then the most recent will be in the lowest place
 
+
 def drawboard(board):
     for col in range(COLUMNS):
         for row in range(ROWS):
-            pygame.draw.rect(screen,BLUE, (col * SCALE, row * SCALE + SCALE, SCALE, SCALE))
-            pygame.draw.circle(screen, BLACK, (int(col*SCALE + SCALE / 2), int(row*SCALE + SCALE + SCALE / 2)), RADIUS)
+            pygame.draw.rect(screen, BLUE, (col * SCALE, row * SCALE + SCALE, SCALE, SCALE))
+            if board[row][col]  ==  0:
+                pygame.draw.circle(screen, BLACK, (int(col * SCALE + SCALE / 2), int(row * SCALE + SCALE + SCALE / 2)),
+
+                               RADIUS)
+    for col in range(COLUMNS):
+         for row in range(ROWS):
+            if board[row][col] == 1:
+                pygame.draw.circle(screen, RED, (int(col * SCALE + SCALE / 2), height - int(row * SCALE + SCALE / 2)),
+                                   RADIUS)
+            elif board[row][col] == 2:
+                pygame.draw.circle(screen, YELLOW,  (int(col * SCALE + SCALE / 2), height - int(row * SCALE + SCALE / 2)),
+                           RADIUS)
+    pygame.display.update()
 
 board = makeboard()
 print(board)
@@ -82,7 +97,7 @@ turn = 0
 # initializing pygame
 pygame.init()
 
-SCALE = 100# unit is in pixels
+SCALE = 100  # unit is in pixels
 width = COLUMNS * SCALE
 height = ROWS + 1 * SCALE
 RADIUS = int(SCALE / 2 - 5)
@@ -97,33 +112,33 @@ while not endgame:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            continue
+        if event.type == pygame.MOUSEBUTTONDOWN and turn == 0:
             # P1 input
-            # if turn == 0:
-            #     col = int(input("Player 1 Pick a column (0 - 6): "))
-            #     if isavailable(board, col):
-            #         row = getnextavailablerow(board, col)
-            #         makemove(board, row, col, 1)
-            #     if checkwinner(board, 1):
-            #         print("Player 1 won!")
-            #         endgame = True
-            #
+            if turn == 0:
+                posx = event.pos[0]  # between 0 and 700 pixels
+                col = int(math.floor(posx/SCALE))
+                if isavailable(board, col):
+                    row = getnextavailablerow(board, col)
+                    makemove(board, row, col, 1)
+                if checkwinner(board, 1):
+                    print("Player 1 won!")
+                    endgame = True
+
             # # P2 input
-            # else:
-            #     col = int(input("Player 2 Pick a column (0 - 6): "))
-            #     if isavailable(board, col):
-            #         row = getnextavailablerow(board, col)
-            #         makemove(board, row, col, 2)
-            #     if checkwinner(board, 2):
-            #         print("Player 2 won!")
-            #         endgame = True
+            else:
+                posx = event.pos[0]  # between 0 and 700 pixels
+                col = int(math.floor(posx / SCALE))
+                if isavailable(board, col):
+                    row = getnextavailablerow(board, col)
+                    makemove(board, row, col, 2)
+                if checkwinner(board, 2):
+                    print("Player 2 won!")
+                    endgame = True
 
-            # printboard(board)
-            #
-            # # Switching the player turns
-            # if turn == 0:
-            #     turn = 1
-            # else:
-            #     turn = 0
-
+            printboard(board)
+            drawboard(board)
+            # Switching the player turns
+            if turn == 0:
+                turn = 1
+            else:
+                turn = 0
