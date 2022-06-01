@@ -108,11 +108,21 @@ drawboard(board)
 
 pygame.display.update()
 
+font = pygame.font.SysFont("calibri", 75)
 while not endgame:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN and turn == 0:
+        if event.type == pygame.MOUSEMOTION:
+            pygame.draw.rect(screen, BLACK, (0,0,width, SCALE))
+            posx = event.pos[0]
+            if turn == 0:
+                pygame.draw.circle(screen, RED, (posx, int(SCALE/2)), RADIUS)
+            else:
+                pygame.draw.circle(screen, YELLOW, (posx, int(SCALE / 2)), RADIUS)
+        pygame.display.update()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pygame.draw.rect(screen, BLACK, (0, 0, width, SCALE))
             # P1 input
             if turn == 0:
                 posx = event.pos[0]  # between 0 and 700 pixels
@@ -121,7 +131,8 @@ while not endgame:
                     row = getnextavailablerow(board, col)
                     makemove(board, row, col, 1)
                 if checkwinner(board, 1):
-                    print("Player 1 won!")
+                    label = font.render("Player 1 won", 1, RED)
+                    screen.blit(label, (40, 10))
                     endgame = True
 
             # # P2 input
@@ -132,7 +143,8 @@ while not endgame:
                     row = getnextavailablerow(board, col)
                     makemove(board, row, col, 2)
                 if checkwinner(board, 2):
-                    print("Player 2 won!")
+                    label = font.render("Player 2 won", 1, YELLOW)
+                    screen.blit(label, (40, 10))
                     endgame = True
 
             printboard(board)
@@ -142,3 +154,5 @@ while not endgame:
                 turn = 1
             else:
                 turn = 0
+            if endgame:
+                pygame.time.wait(3000) # waits for 3 seconds
