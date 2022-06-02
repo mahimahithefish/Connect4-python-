@@ -11,3 +11,15 @@ The easy level AI is implemented by generating a random number between 0 and 6 a
 
 ### Expert level
 
+
+
+# Resources
+[Minimax implentation in Connect 4](https://youtu.be/MMLtza3CZFM)
+[Minimax pseudocode](https://en.wikipedia.org/wiki/Minimax)
+
+## Python Libraries
+- [Numpy](https://numpy.org/)
+- Math
+- [Pygame](https://www.pygame.org/docs/)
+- Sys 
+- Random
