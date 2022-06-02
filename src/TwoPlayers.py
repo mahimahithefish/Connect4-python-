@@ -1,15 +1,17 @@
-import math
+import math # for the random number generator
 import sys
 
-import numpy as np  # this library allows us to use a matrix
-import pygame
+import numpy as np  # for the matrix
+import pygame # for the graphics
 
 ROWS = 6
 COLUMNS = 7
+
 BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
+
 def makeboard():
     # Top most row is the 5th row
     board = np.zeros((ROWS, COLUMNS))  # make a matrix of 6 rows and 7 columns
@@ -72,21 +74,20 @@ def printboard(board):
 
 
 def drawboard(board):
-    for col in range(COLUMNS):
-        for row in range(ROWS):
-            pygame.draw.rect(screen, BLUE, (col * SCALE, row * SCALE + SCALE, SCALE, SCALE))
-            if board[row][col]  ==  0:
-                pygame.draw.circle(screen, BLACK, (int(col * SCALE + SCALE / 2), int(row * SCALE + SCALE + SCALE / 2)),
+    for c in range(COLUMNS):
+        for r in range(ROWS):
+            pygame.draw.rect(screen, BLUE, (c * SCALE, r * SCALE + SCALE, SCALE, SCALE))
+            pygame.draw.circle(screen, BLACK, (
+            int(c * SCALE + SCALE / 2), int(r * SCALE + SCALE + SCALE / 2)), RADIUS)
 
-                               RADIUS)
-    for col in range(COLUMNS):
-         for row in range(ROWS):
-            if board[row][col] == 1:
-                pygame.draw.circle(screen, RED, (int(col * SCALE + SCALE / 2), height - int(row * SCALE + SCALE / 2)),
-                                   RADIUS)
-            elif board[row][col] == 2:
-                pygame.draw.circle(screen, YELLOW,  (int(col * SCALE + SCALE / 2), height - int(row * SCALE + SCALE / 2)),
-                           RADIUS)
+    for c in range(COLUMNS):
+        for r in range(ROWS):
+            if board[r][c] == 1:
+                pygame.draw.circle(screen, RED, (
+                int(c * SCALE + SCALE / 2), height - int(r * SCALE + SCALE / 2)), RADIUS)
+            elif board[r][c] == 2:
+                pygame.draw.circle(screen, YELLOW, (
+                int(c * SCALE + SCALE / 2), height - int(r * SCALE + SCALE / 2)), RADIUS)
     pygame.display.update()
 
 board = makeboard()
@@ -98,21 +99,27 @@ turn = 0
 pygame.init()
 
 SCALE = 100  # unit is in pixels
-width = COLUMNS * SCALE
-height = ROWS + 1 * SCALE
-RADIUS = int(SCALE / 2 - 5)
 
-windowsize = (width, height)
-screen = pygame.display.set_mode(windowsize)
+width = COLUMNS * SCALE
+height = (ROWS + 1) * SCALE
+size = (width, height)
+
+RADIUS = int(SCALE/2 - 5)
+
+screen = pygame.display.set_mode(size)
 drawboard(board)
+pygame.display.update()
 
 pygame.display.update()
 
 font = pygame.font.SysFont("calibri", 75)
 while not endgame:
+
     for event in pygame.event.get():
+
         if event.type == pygame.QUIT:
             sys.exit()
+
         if event.type == pygame.MOUSEMOTION:
             pygame.draw.rect(screen, BLACK, (0,0,width, SCALE))
             posx = event.pos[0]
@@ -121,19 +128,22 @@ while not endgame:
             else:
                 pygame.draw.circle(screen, YELLOW, (posx, int(SCALE / 2)), RADIUS)
         pygame.display.update()
+
         if event.type == pygame.MOUSEBUTTONDOWN:
             pygame.draw.rect(screen, BLACK, (0, 0, width, SCALE))
             # P1 input
             if turn == 0:
                 posx = event.pos[0]  # between 0 and 700 pixels
                 col = int(math.floor(posx/SCALE))
+
                 if isavailable(board, col):
                     row = getnextavailablerow(board, col)
                     makemove(board, row, col, 1)
-                if checkwinner(board, 1):
-                    label = font.render("Player 1 won", 1, RED)
-                    screen.blit(label, (40, 10))
-                    endgame = True
+
+                    if checkwinner(board, 1):
+                        label = font.render("PLAYER 1 WON !", 1, RED)
+                        screen.blit(label, (40, 10))
+                        endgame = True
 
             # # P2 input
             else:
@@ -142,10 +152,11 @@ while not endgame:
                 if isavailable(board, col):
                     row = getnextavailablerow(board, col)
                     makemove(board, row, col, 2)
-                if checkwinner(board, 2):
-                    label = font.render("Player 2 won", 1, YELLOW)
-                    screen.blit(label, (40, 10))
-                    endgame = True
+
+                    if checkwinner(board, 2):
+                        label = font.render("PLAYER 2 WON !", 1, YELLOW)
+                        screen.blit(label, (40, 10))
+                        endgame = True
 
             printboard(board)
             drawboard(board)
@@ -155,4 +166,4 @@ while not endgame:
             else:
                 turn = 0
             if endgame:
-                pygame.time.wait(3000) # waits for 3 seconds
+                pygame.time.wait(2000) # waits for 2 seconds for the gaming window to close
