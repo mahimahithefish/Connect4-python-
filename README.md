@@ -7,8 +7,6 @@ This is a recreation of the classic Connect 4 game in Python. The Game alows the
 ### Easy level
 The easy level AI is implemented by generating a random number between 0 and 6 and the AI will make the move if the number genrated is available on the column. This AI mostly do not block the opposing player's move. 
 
-### Medium level
-
 ### Expert level
 
 
