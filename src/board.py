@@ -10,6 +10,7 @@ BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
+WHITE = (255, 255, 255)
 
 # ALl the graphics calculations
 SCALE = 100  # unit is in pixels
@@ -18,6 +19,17 @@ height = (ROWS + 1) * SCALE
 size = (width, height)
 screen = pygame.display.set_mode(size)
 RADIUS = int(SCALE/2 - 5)
+
+
+# Turn values
+PLAYER = 0
+COMPUTER_PLAYER = 1
+
+# Mark values
+PLAYER_MARK = 1
+COMPUTER_PLAYER_MARK = 2
+AVAILABLE = 0
+
 
 def makeboard():
     # Top most row is the 5th row
@@ -38,6 +50,12 @@ def getnextavailablerow(board, col):
         if board[row][col] == 0:
             return row
 
+def isTie(board):
+    for col in range(COLUMNS):
+        for row in range(ROWS):
+            if board[row][col] == 0:
+                return False
+    return True
 
 def checkwinner(board, mark):
     # if there is 4 in a row or col, or diagonally

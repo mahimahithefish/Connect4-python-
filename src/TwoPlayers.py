@@ -2,7 +2,7 @@ from board import *
 import math
 import sys
 
-def startgame():
+def startgameTwoPlayers():
     board = makeboard()
 
     endgame = False
@@ -46,6 +46,10 @@ def startgame():
                             label = font.render("PLAYER 1 WON !", 1, RED)
                             screen.blit(label, (40, 10))
                             endgame = True
+                        elif isTie(board): # Check if the board is full
+                            label = font.render("Game is a Draw", 1, WHITE)
+                            screen.blit(label, (40, 10))
+                            endgame = True
 
                 # # P2 input
                 else:
@@ -59,6 +63,10 @@ def startgame():
                             label = font.render("PLAYER 2 WON !", 1, YELLOW)
                             screen.blit(label, (40, 10))
                             endgame = True
+                        elif isTie(board): # Check if the board is full
+                            label = font.render("Game is a Draw", 1, WHITE)
+                            screen.blit(label, (40, 10))
+                            endgame = True
 
                 printboard(board)
                 drawboard(board)
@@ -68,4 +76,4 @@ def startgame():
                 else:
                     turn = 0
                 if endgame:
-                    pygame.time.wait(3000)  # waits for 3 seconds for the gaming window to close
+                    pygame.time.wait(2500)  # waits for 3 seconds for the gaming window to close
