@@ -1,6 +1,8 @@
-import numpy as np  # for the matrix
-import pygame # for the graphics
-
+import numpy as np
+import random
+import pygame
+import sys
+import math
 
 ROWS = 6
 COLUMNS = 7
@@ -42,24 +44,24 @@ def makemove(board, row, col, mark):
 
 
 def isavailable(board, col):  # Checks if the given column is available to make a move
-    return board[ROWS - 1][col] == 0  # If it is true then we are good to make a move in this column!
+    return board[ROWS - 1][col] == AVAILABLE  # If it is true then we are good to make a move in this column!
 
 
 def getnextavailablerow(board, col):
     for row in range(ROWS):
-        if board[row][col] == 0:
+        if board[row][col] == AVAILABLE:
             return row
 
 def isTie(board):
     for col in range(COLUMNS):
         for row in range(ROWS):
-            if board[row][col] == 0:
+            if board[row][col] == AVAILABLE:
                 return False
     return True
 
 def checkwinner(board, mark):
     # if there is 4 in a row or col, or diagonally
-    return horizontalcheck(board, mark) or verticalcheck(board, mark) or diagonalcheck(board, mark)
+    return horizontalcheck(board, mark) or verticalcheck(board, mark) or diagonalcheck(board, mark) or isTie(board)
 
 
 def horizontalcheck(board, mark):
@@ -113,3 +115,4 @@ def drawboard(board):
                 pygame.draw.circle(screen, YELLOW, (
                 int(c * SCALE + SCALE / 2), height - int(r * SCALE + SCALE / 2)), RADIUS)
     pygame.display.update()
+

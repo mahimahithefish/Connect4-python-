@@ -3,13 +3,12 @@ import math
 import sys
 from board import *
 
-
-
 def easyAIstartgame():
     board = makeboard()
     printboard(board)
     game_over = False
-    turn = 0
+    turn = random.randint(PLAYER, COMPUTER_PLAYER) # taking random turns
+
 
     pygame.init()
 
@@ -26,7 +25,7 @@ def easyAIstartgame():
                 if event.type == pygame.MOUSEMOTION:
                     pygame.draw.rect(screen, BLACK, (0, 0, width, SCALE))
                     posx = event.pos[0]
-                    if turn == 0:
+                    if turn == PLAYER:
                         pygame.draw.circle(screen, RED, (posx, int(SCALE / 2)), RADIUS)
                     else:
                         pygame.draw.circle(screen, YELLOW, (posx, int(SCALE / 2)), RADIUS)
@@ -35,15 +34,15 @@ def easyAIstartgame():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pygame.draw.rect(screen, BLACK, (0, 0, width, SCALE))
 
-                    if turn == 0:
+                    if turn == PLAYER:
                         posx = event.pos[0]
                         col = int(math.floor(posx / SCALE))
 
                         if isavailable(board, col):
                             row = getnextavailablerow(board, col)
-                            makemove(board, row, col, 1)
+                            makemove(board, row, col, PLAYER_MARK)
 
-                            if checkwinner(board, 1):
+                            if checkwinner(board, PLAYER_MARK):
                                 label = font.render("PLAYER 1 WON!", 1, RED)
                                 screen.blit(label, (40, 10))
                                 game_over = True
@@ -55,19 +54,19 @@ def easyAIstartgame():
                         printboard(board)
                         drawboard(board)
 
-                        turn = 1 # Switching players
+                        turn = COMPUTER_PLAYER # Switching players
 
                 # Computer's turn will make move
-                if turn == 1 and not game_over:
+                if turn == COMPUTER_PLAYER and not game_over:
 
                     col = random.randint(0, COLUMNS - 1)
 
                     if isavailable(board, col):
                         pygame.time.wait(500)
                         row = getnextavailablerow(board, col)
-                        makemove(board, row, col, 2)
+                        makemove(board, row, col, COMPUTER_PLAYER_MARK)
 
-                        if checkwinner(board, 2):
+                        if checkwinner(board, COMPUTER_PLAYER_MARK):
                             label = font.render("PLAYER 2 WON!", 1, YELLOW)
                             screen.blit(label, (40, 10))
                             game_over = True
@@ -82,4 +81,4 @@ def easyAIstartgame():
                     turn = 0 # Switching players
 
                     if game_over:
-                        pygame.time.wait(3500)
+                        pygame.time.wait(5000)

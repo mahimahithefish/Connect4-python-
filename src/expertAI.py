@@ -1,224 +1,260 @@
-import math  # for the random number generator
-import random
-import sys
-
 from board import *
-
-# Turn values
-PLAYER = 0
-COMPUTER_PLAYER = 1
-
-# Mark values
-PLAYER_MARK = 1
-COMPUTER_PLAYER_MARK = 2
-AVAILABLE = 0
 
 WINDOW_LENGTH = 4
 
 
-
-def evaluate_window(window, piece):
+def evaluate_window(window, mark):
     score = 0
-    opp_piece = PLAYER_MARK
-    if piece == PLAYER_MARK:
-        opp_piece = COMPUTER_PLAYER_MARK
+    opponent = PLAYER_MARK
 
-    if window.count(piece) == 4:
+    if mark == PLAYER_MARK:
+        opponent = COMPUTER_PLAYER_MARK
+
+    if window.count(mark) == 4:
         score += 100
-    elif window.count(piece) == 3 and window.count(AVAILABLE) == 1:
+
+    elif window.count(mark) == 3 and window.count(AVAILABLE) == 1:
         score += 5
-    elif window.count(piece) == 2 and window.count(AVAILABLE) == 2:
+
+    elif window.count(mark) == 2 and window.count(AVAILABLE) == 2:
         score += 2
 
-    if window.count(opp_piece) == 3 and window.count(AVAILABLE) == 1:
+    if window.count(opponent) == 3 and window.count(AVAILABLE) == 1:
         score -= 4
 
     return score
 
 
-def score_position(board, piece):
+def score_position(board, mark):
     score = 0
 
-    ## Score center column
-    center_array = [int(i) for i in list(board[:, COLUMNS // 2])]
-    center_count = center_array.count(piece)
+    score += scoreCenter(board, mark)  # Scoring the center column
+    score += scoreHorizonally(board, mark)  # scoring the row
+    score += scoreVertically(board, mark)  # Scoring the column
+    score += scoreDiag(board, mark)  # Scoring the Diagonal
+    return score
+
+
+def scoreCenter(board, mark):  # scoring the center column
+    score = 0
+    centerArray = [int(i) for i in list(board[:, COLUMNS // 2])]
+    center_count = centerArray.count(mark)
     score += center_count * 3
-
-    ## Score Horizontal
-    for r in range(ROWS):
-        row_array = [int(i) for i in list(board[r, :])]
-        for c in range(COLUMNS - 3):
-            window = row_array[c:c + WINDOW_LENGTH]
-            score += evaluate_window(window, piece)
-
-    ## Score Vertical
-    for c in range(COLUMNS):
-        col_array = [int(i) for i in list(board[:, c])]
-        for r in range(ROWS - 3):
-            window = col_array[r:r + WINDOW_LENGTH]
-            score += evaluate_window(window, piece)
-
-    ## Score posiive sloped diagonal
-    for r in range(ROWS - 3):
-        for c in range(COLUMNS - 3):
-            window = [board[r + i][c + i] for i in range(WINDOW_LENGTH)]
-            score += evaluate_window(window, piece)
-
-    for r in range(ROWS - 3):
-        for c in range(COLUMNS - 3):
-            window = [board[r + 3 - i][c + i] for i in range(WINDOW_LENGTH)]
-            score += evaluate_window(window, piece)
 
     return score
 
 
-def getValidLocation(board):
-    validlocations = []
+def scoreHorizonally(board, mark):
+    score = 0
+    for r in range(ROWS):
+        row_array = [int(i) for i in list(board[r, :])]
+        for c in range(COLUMNS - 3):
+            window = row_array[c:c + WINDOW_LENGTH]
+            score += evaluate_window(window, mark)
+
+    return score
+
+
+def scoreVertically(board, mark):
+    score = 0
     for c in range(COLUMNS):
-        if isavailable(board, c):
-            validlocations.append(col)
-    return validlocations
+        col_array = [int(i) for i in list(board[:, c])]
+        for r in range(ROWS - 3):
+            window = col_array[r:r + WINDOW_LENGTH]
+            score += evaluate_window(window, mark)
+    return score
 
 
-def bestmove(board, piece):
-    bestScore = 0
-    validlocations = getValidLocation(board)
-    bestcol = random.choice(validlocations)
-    for c in validlocations:
-        row = getnextavailablerow(board, c)
-        tempboard = board.copy()  # any modifications will not change the original
-        makemove(tempboard, row, col, piece)
+def scoreDiag(board, mark):
+    score = 0
 
-        sum = score_position(tempboard, piece)
+    for r in range(ROWS - 3):  # positive slope
+        for c in range(COLUMNS - 3):
+            window = [board[r + i][c + i] for i in range(WINDOW_LENGTH)]
+            score += evaluate_window(window, mark)
 
-        if sum > bestScore:
-            bestScore = sum
-            bestcol = col
-    return bestcol
+    for r in range(ROWS - 3):  # negative slope
+        for c in range(COLUMNS - 3):
+            window = [board[r + 3 - i][c + i] for i in range(WINDOW_LENGTH)]
+            score += evaluate_window(window, mark)
 
+    return score
 
 
+def is_terminal_node(board):
+    return checkwinner(board, PLAYER_MARK) or checkwinner(board, COMPUTER_PLAYER_MARK) or isTie(board)
 
-def isTerminalnode(board):
-    return checkwinner(board, PLAYER_MARK) or checkwinner(board, AVAILABLE) or len(getValidLocation(board)) == 0
 
-def minimax(board, depth, maxplayer ):
-    validlocations = getValidLocation(board)
-    is_terminal = isTerminalnode(board)
+def minimax(board, depth, alpha, beta, maxPlayer):
+    valid_locations = get_valid_locations(board)
+    is_terminal = is_terminal_node(board)
     if depth == 0 or is_terminal:
         if is_terminal:
             if checkwinner(board, COMPUTER_PLAYER_MARK):
-                return {None, 10000}
+                return (None, 100000000000000)
             elif checkwinner(board, PLAYER_MARK):
-                return {None, -10000}
-            else: #board that is not terminal
-                return {None, 0}
-        else:
-            return {None, score_position(board, COMPUTER_PLAYER_MARK )}
-    if maxplayer:
+                return (None, -10000000000000)
+            else:  # Game is over, no more valid moves
+                return (None, 0)
+        else:  # Depth is zero
+            return (None, score_position(board, COMPUTER_PLAYER_MARK))
+    if maxPlayer:
         value = -math.inf
-        columns = random.choice(validlocations)
-        for col in validlocations:
+        column = random.choice(valid_locations)
+        for col in valid_locations:
             row = getnextavailablerow(board, col)
-            bcopy  = board.copy()
-            makemove(bcopy, row, col, COMPUTER_PLAYER_MARK)
-            new_score = minimax(bcopy, depth -1, False)[1]
+            b_copy = board.copy()
+            makemove(b_copy, row, col, COMPUTER_PLAYER_MARK)
+            new_score = minimax(b_copy, depth - 1, alpha, beta, False)[1]
             if new_score > value:
                 value = new_score
-                columns = col
-            return columns, value
-    else:
-        value = math.inf
-        columns = random.choice(validlocations)
+                column = col
+            alpha = max(alpha, value)
+            if alpha >= beta:
+                break
+        return column, value
 
-        for col in validlocations:
+    else:  # Minimizing player
+        value = math.inf
+        column = random.choice(valid_locations)
+        for col in valid_locations:
             row = getnextavailablerow(board, col)
-            bcopy = board.copy()
-            makemove(bcopy, row, col, PLAYER_MARK)
-            new_score =  minimax(bcopy, depth - 1, True)[1]
+            b_copy = board.copy()
+            makemove(b_copy, row, col, PLAYER_MARK)
+            new_score = minimax(b_copy, depth - 1, alpha, beta, True)[1]
             if new_score < value:
                 value = new_score
-                columns = col
-            return columns, value
+                column = col
+            beta = min(beta, value)
+            if alpha >= beta:
+                break
+        return column, value
+
+
+def get_valid_locations(board):
+    valid_locations = []
+    for col in range(COLUMNS):
+        if isavailable(board, col):
+            valid_locations.append(col)
+    return valid_locations
+
+
+def pick_best_move(board, piece):
+    valid_locations = get_valid_locations(board)
+    best_score = -10000
+    best_col = random.choice(valid_locations)
+    for col in valid_locations:
+        row = getnextavailablerow(board, col)
+        temp_board = board.copy()
+        makemove(temp_board, row, col, piece)
+        score = score_position(temp_board, piece)
+        if score > best_score:
+            best_score = score
+            best_col = col
+
+    return best_col
+
+
+def draw_board(board):
+    for c in range(COLUMNS):
+        for r in range(ROWS):
+            pygame.draw.rect(screen, BLUE, (c * SQUARESIZE, r * SQUARESIZE + SQUARESIZE, SQUARESIZE, SQUARESIZE))
+            pygame.draw.circle(screen, BLACK, (
+                int(c * SQUARESIZE + SQUARESIZE / 2), int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE / 2)), RADIUS)
+
+    for c in range(COLUMNS):
+        for r in range(ROWS):
+            if board[r][c] == PLAYER_MARK:
+                pygame.draw.circle(screen, RED, (
+                    int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
+            elif board[r][c] == COMPUTER_PLAYER_MARK:
+                pygame.draw.circle(screen, YELLOW, (
+                    int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
+    pygame.display.update()
+
 
 board = makeboard()
-print(board)
+printboard(board)
+game_over = False
 
-endgame = False
-turn = random.randint(PLAYER, COMPUTER_PLAYER)  # random starting
-
-# initializing pygame
 pygame.init()
 
+SQUARESIZE = 100
 
-drawboard(board)
+width = COLUMNS * SQUARESIZE
+height = (ROWS + 1) * SQUARESIZE
+
+size = (width, height)
+
+RADIUS = int(SQUARESIZE / 2 - 5)
+
+screen = pygame.display.set_mode(size)
+draw_board(board)
 pygame.display.update()
 
+myfont = pygame.font.SysFont("calibri", 75)
 
+turn = random.randint(PLAYER, COMPUTER_PLAYER)
 
-font = pygame.font.SysFont("calibri", 75)
-while not endgame:
+while not game_over:
 
     for event in pygame.event.get():
-
         if event.type == pygame.QUIT:
             sys.exit()
 
         if event.type == pygame.MOUSEMOTION:
-            pygame.draw.rect(screen, BLACK, (0, 0, width, SCALE))
+            pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
             posx = event.pos[0]
             if turn == PLAYER:
-                pygame.draw.circle(screen, RED, (posx, int(SCALE / 2)), RADIUS)
+                pygame.draw.circle(screen, RED, (posx, int(SQUARESIZE / 2)), RADIUS)
+
         pygame.display.update()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            pygame.draw.rect(screen, BLACK, (0, 0, width, SCALE))
-            # P1 input
-            if turn == 0:
-                posx = event.pos[0]  # between 0 and 700 pixels
-                col = int(math.floor(posx / SCALE))
+            pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
+            # print(event.pos)
+            # Ask for Player 1 Input
+            if turn == PLAYER:
+                posx = event.pos[0]
+                col = int(math.floor(posx / SQUARESIZE))
 
                 if isavailable(board, col):
                     row = getnextavailablerow(board, col)
                     makemove(board, row, col, PLAYER_MARK)
 
                     if checkwinner(board, PLAYER_MARK):
-                        label = font.render("Player 1 won !", 1, RED)
+                        label = myfont.render("PLAYER 1 WINS ! ", 1, RED)
                         screen.blit(label, (40, 10))
-                        endgame = True
+                        game_over = True
 
-                    if turn == PLAYER:
-                        turn = COMPUTER_PLAYER
-                    else:
-                        turn = PLAYER
+                    turn += 1
+                    turn = turn % 2
 
                     printboard(board)
-                    drawboard(board)
+                    draw_board(board)
 
-    # P2 input
-    if turn == COMPUTER_PLAYER and not endgame:
+    # # Ask for Player 2 Input
+    if turn == COMPUTER_PLAYER and not game_over:
 
-        # col = random.randint(0, COLUMNS -1)
-        col, minimax_score = minimax(board, 4, True)
-        # col = bestmove(board, COMPUTER_PLAYER_MARK)
+        # col = random.randint(0, COLUMNS-1)
+        # col = pick_best_move(board, COMPUTER_PLAYER_MARK)
+        col, minimax_score = minimax(board, 5, -math.inf, math.inf, True)
+
         if isavailable(board, col):
-            pygame.time.wait(500)
-
+            # pygame.time.wait(500)
             row = getnextavailablerow(board, col)
             makemove(board, row, col, COMPUTER_PLAYER_MARK)
 
             if checkwinner(board, COMPUTER_PLAYER_MARK):
-                label = font.render("Player 2 won !", 1, YELLOW)
+                label = myfont.render("PLAYER 2 WINS !", 1, YELLOW)
                 screen.blit(label, (40, 10))
-                endgame = True
+                game_over = True
 
             printboard(board)
-            drawboard(board)
-            # Switching the player turns
-            if turn == PLAYER:
-                turn = COMPUTER_PLAYER
-            else:
-                turn = PLAYER
+            draw_board(board)
 
-            if endgame:
-                pygame.time.wait(3000)  # waits for 3 seconds before closing the window
+            turn += 1
+            turn = turn % 2
+
+    if game_over:
+        pygame.time.wait(3000)
