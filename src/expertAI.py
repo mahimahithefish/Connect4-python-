@@ -81,27 +81,27 @@ def scoreDiag(board, mark):
     return score
 
 
-def is_terminal_node(board):
+def end_node(board):
     return checkwinner(board, PLAYER_MARK) or checkwinner(board, COMPUTER_PLAYER_MARK) or isTie(board)
 
 
 def minimax(board, depth, alpha, beta, maxPlayer):
-    valid_locations = get_valid_locations(board)
-    is_terminal = is_terminal_node(board)
+    valid_locs = get_valid_locations(board)
+    is_terminal = end_node(board)
     if depth == 0 or is_terminal:
         if is_terminal:
             if checkwinner(board, COMPUTER_PLAYER_MARK):
                 return (None, 100000000000000)
             elif checkwinner(board, PLAYER_MARK):
                 return (None, -10000000000000)
-            else:  # Game is over, no more valid moves
+            else:  # game ended
                 return (None, 0)
         else:  # Depth is zero
             return (None, score_position(board, COMPUTER_PLAYER_MARK))
     if maxPlayer:
         value = -math.inf
-        column = random.choice(valid_locations)
-        for col in valid_locations:
+        column = random.choice(valid_locs)
+        for col in valid_locs:
             row = getnextavailablerow(board, col)
             b_copy = board.copy()
             makemove(b_copy, row, col, COMPUTER_PLAYER_MARK)
@@ -116,8 +116,8 @@ def minimax(board, depth, alpha, beta, maxPlayer):
 
     else:  # Minimizing player
         value = math.inf
-        column = random.choice(valid_locations)
-        for col in valid_locations:
+        column = random.choice(valid_locs)
+        for col in valid_locs:
             row = getnextavailablerow(board, col)
             b_copy = board.copy()
             makemove(b_copy, row, col, PLAYER_MARK)
@@ -131,12 +131,12 @@ def minimax(board, depth, alpha, beta, maxPlayer):
         return column, value
 
 
-def get_valid_locations(board):
-    valid_locations = []
+def get_valid_locations(board):  # Returns the columns on the board that are still available
+    valid_locs = []
     for col in range(COLUMNS):
         if isavailable(board, col):
-            valid_locations.append(col)
-    return valid_locations
+            valid_locs.append(col)
+    return valid_locs
 
 
 def pick_best_move(board, piece):
@@ -155,41 +155,14 @@ def pick_best_move(board, piece):
     return best_col
 
 
-def draw_board(board):
-    for c in range(COLUMNS):
-        for r in range(ROWS):
-            pygame.draw.rect(screen, BLUE, (c * SQUARESIZE, r * SQUARESIZE + SQUARESIZE, SQUARESIZE, SQUARESIZE))
-            pygame.draw.circle(screen, BLACK, (
-                int(c * SQUARESIZE + SQUARESIZE / 2), int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE / 2)), RADIUS)
-
-    for c in range(COLUMNS):
-        for r in range(ROWS):
-            if board[r][c] == PLAYER_MARK:
-                pygame.draw.circle(screen, RED, (
-                    int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
-            elif board[r][c] == COMPUTER_PLAYER_MARK:
-                pygame.draw.circle(screen, YELLOW, (
-                    int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
-    pygame.display.update()
-
-
 board = makeboard()
 printboard(board)
 game_over = False
 
 pygame.init()
 
-SQUARESIZE = 100
-
-width = COLUMNS * SQUARESIZE
-height = (ROWS + 1) * SQUARESIZE
-
-size = (width, height)
-
-RADIUS = int(SQUARESIZE / 2 - 5)
-
 screen = pygame.display.set_mode(size)
-draw_board(board)
+drawboard(board)
 pygame.display.update()
 
 myfont = pygame.font.SysFont("calibri", 75)
@@ -203,20 +176,20 @@ while not game_over:
             sys.exit()
 
         if event.type == pygame.MOUSEMOTION:
-            pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
+            pygame.draw.rect(screen, BLACK, (0, 0, width, SCALE))
             posx = event.pos[0]
             if turn == PLAYER:
-                pygame.draw.circle(screen, RED, (posx, int(SQUARESIZE / 2)), RADIUS)
+                pygame.draw.circle(screen, RED, (posx, int(SCALE / 2)), RADIUS)
 
         pygame.display.update()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
+            pygame.draw.rect(screen, BLACK, (0, 0, width, SCALE))
             # print(event.pos)
             # Ask for Player 1 Input
             if turn == PLAYER:
                 posx = event.pos[0]
-                col = int(math.floor(posx / SQUARESIZE))
+                col = int(math.floor(posx / SCALE))
 
                 if isavailable(board, col):
                     row = getnextavailablerow(board, col)
@@ -231,7 +204,7 @@ while not game_over:
                     turn = turn % 2
 
                     printboard(board)
-                    draw_board(board)
+                    drawboard(board)
 
     # # Ask for Player 2 Input
     if turn == COMPUTER_PLAYER and not game_over:
@@ -251,7 +224,7 @@ while not game_over:
                 game_over = True
 
             printboard(board)
-            draw_board(board)
+            drawboard(board)
 
             turn += 1
             turn = turn % 2

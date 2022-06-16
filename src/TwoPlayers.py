@@ -2,7 +2,8 @@ from board import *
 import math
 import sys
 
-def startgameTwoPlayers():
+
+def startTwoGame():
     board = makeboard()
 
     endgame = False
@@ -19,15 +20,15 @@ def startgameTwoPlayers():
     while not endgame:
         for event in pygame.event.get():
 
-            if event.type == pygame.QUIT: # Exiting the game without any wins
+            if event.type == pygame.QUIT:  # Exiting the game without any wins
                 sys.exit()
 
             if event.type == pygame.MOUSEMOTION:
                 pygame.draw.rect(screen, BLACK, (0, 0, width, SCALE))
                 posx = event.pos[0]
-                if turn == 0: # Red player's Mark will be put on the board
+                if turn == 0:  # Red player's Mark will be put on the board
                     pygame.draw.circle(screen, RED, (posx, int(SCALE / 2)), RADIUS)
-                else: # Yellow player's mark will be put on the board
+                else:  # Yellow player's mark will be put on the board
                     pygame.draw.circle(screen, YELLOW, (posx, int(SCALE / 2)), RADIUS)
             pygame.display.update()
 
@@ -46,7 +47,7 @@ def startgameTwoPlayers():
                             label = font.render("PLAYER 1 WON !", 1, RED)
                             screen.blit(label, (40, 10))
                             endgame = True
-                        elif isTie(board): # Check if the board is full
+                        elif isTie(board):  # Check if the board is full
                             label = font.render("Game is a Draw", 1, WHITE)
                             screen.blit(label, (40, 10))
                             endgame = True
@@ -63,7 +64,7 @@ def startgameTwoPlayers():
                             label = font.render("PLAYER 2 WON !", 1, YELLOW)
                             screen.blit(label, (40, 10))
                             endgame = True
-                        elif isTie(board): # Check if the board is full
+                        elif isTie(board):  # Check if the board is full
                             label = font.render("Game is a Draw", 1, WHITE)
                             screen.blit(label, (40, 10))
                             endgame = True
