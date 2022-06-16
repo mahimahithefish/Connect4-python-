@@ -23,16 +23,7 @@ The easy level AI is implemented by generating a random number between 0 and 6 a
 ### Expert AI
 This version of the AI uses the Minimax algorithm which is used in decision-making and game theory. It tries to make the optimal moves using a scoring fucntion. At the start of the game, After the player first makes their move, (first turn between the human player and the AI player is randomized), the AI uses a scoring method and uses depth to  "look ahead" to calculate the best next move based on the current moves already made on the board.
 
-
-
 # Resources
 - [Similar Project idea](https://www.youtube.com/watch?v=UYgyRArKDEs&list=PLFCB5Dp81iNV_inzM-R9AKkZZlePCZdtV&index=1)
 - [Minimax implentation in Connect 4](https://youtu.be/MMLtza3CZFM)
 - [Minimax pseudocode](https://en.wikipedia.org/wiki/Minimax)
-
-## Python Libraries
-- [Numpy](https://numpy.org/)
-- Math
-- [Pygame](https://www.pygame.org/docs/)
-- Sys 
-- Random
