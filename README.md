@@ -21,7 +21,7 @@ When a player wins, this is how the board will be diplaying the message to the U
 The easy level AI is implemented by generating a random number between 0 and 6 and the AI will make the move if the number genrated is available on the column. This AI mostly do not block the opposing player's move. 
 
 ### Expert AI
-This version of the AI uses the Minimax algorithm which is used in decision-making and game theory. It tries to make the optimal moves using a scoring fucntion. At the start of the game, After the player first makes their move, (first turn between the human player and the AI player is randomized),
+This version of the AI uses the Minimax algorithm which is used in decision-making and game theory. It tries to make the optimal moves using a scoring fucntion. At the start of the game, After the player first makes their move, (first turn between the human player and the AI player is randomized), the AI uses a scoring method and uses depth to  "look ahead" to calculate the best next move based on the current moves already made on the board.
 
 
 
